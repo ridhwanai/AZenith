@@ -51,5 +51,10 @@ nohup app_process -Djava.class.path="$APK_COMP" / \
     "$MODULE_CONFIG/background_apps" \
     "$MODULE_CONFIG/java.lock" >"$MODULE_CONFIG/sysmon.log" 2>&1 &
     
+# RN9 fork: background battery-drain monitor (screen-on vs screen-off)
+if [ -f "$MODDIR/azenith-drainmon.sh" ]; then
+    nohup sh "$MODDIR/azenith-drainmon.sh" >/dev/null 2>&1 &
+fi
+
 # Run AZenith service
 sleep 1 && exec "$BIN_SVC" --run

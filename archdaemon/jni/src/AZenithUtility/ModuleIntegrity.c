@@ -20,39 +20,11 @@
  * @brief Checks if the module properties have been renamed or modified by a 3rd party.
  */
 void is_kanged(void) {
-    if (systemv("grep -q '^name=AZenith火$' %s", MODULE_PROP) != 0) [[clang::unlikely]] {
-        goto doorprize;
-    }
-
-    if (systemv("grep -q '^author=ArchHaven Developers$' %s", MODULE_PROP) != 0) [[clang::unlikely]] {
-        goto doorprize;
-    }
-
+    /* RN9 fork: built from source by the device owner, fork detection disabled. */
     return;
-
-doorprize:
-    log_zenith(LOG_FATAL, "Module modified by 3rd party, exiting.");
-    notify("Daemon Error", "Trying to rename me?", true, 0);
-    __system_property_set("persist.sys.azenith.service", "");
-    __system_property_set("persist.sys.azenith.state", "stopped");
-    exit(EXIT_FAILURE);
 }
 
-/**
- * @brief Compares the version inside module.prop with the daemon version.
- */
 void check_module_version(void) {
-    char DAEMON_VERSION[MAX_LINE] = {0};
-
+    /* RN9 fork: version is injected at build time; mismatch abort disabled. */
     snprintf(DAEMON_VERSION, sizeof(DAEMON_VERSION), "%s", MODULE_VERSION);
-
-    int ret = systemv("grep -q '^version=%s$' %s", DAEMON_VERSION, MODULE_PROP);
-
-    if (ret != 0) [[clang::unlikely]] {
-        log_zenith(LOG_FATAL, "AZenith version mismatch with daemon version! please reinstall the module!");
-        notify("Daemon Error", "AZenith version mismatch, please reinstall!", true, 0);
-        __system_property_set("persist.sys.azenith.service", "");
-        __system_property_set("persist.sys.azenith.state", "stopped");
-        exit(EXIT_FAILURE);
-    }
 }

@@ -57,9 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.*
-import androidx.navigation.navArgument
 import com.topjohnwu.superuser.Shell
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.blur.blurEffect
@@ -95,7 +93,6 @@ class MainActivity : ComponentActivity() {
             }
             
             when (component?.className) {
-                "zx.azenith.TileService.BypassChgTileService" -> "bypass"
                 "zx.azenith.TileService.ProfileTileService" -> "profile"
                 else -> null
             }
@@ -132,13 +129,6 @@ fun MainScreen(fromTileType: String? = null) {
 
     LaunchedEffect(fromTileType) {
         when (fromTileType) {
-            "bypass" -> {
-                navController.navigate("bypasschg") {
-                    popUpTo("home") { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
             "profile" -> {
                 navController.navigate("home") {
                     popUpTo("home") { saveState = true }
@@ -191,13 +181,13 @@ fun MainScreen(fromTileType: String? = null) {
     val navItems = remember {
         listOf(
             NavItem("home", R.string.nav_home, Icons.Rounded.Home),
-            NavItem("applist", R.string.nav_applist, Icons.Rounded.Widgets),
+            NavItem("hibernate", R.string.nav_hibernate, Icons.Rounded.Bedtime),
             NavItem("tweaks", R.string.nav_tweaks, Icons.Rounded.SettingsInputComponent),
             NavItem("settings", R.string.nav_settings, Icons.Rounded.Settings)
         )
     }
     
-    val bottomBarRoutes = remember { setOf("home", "applist", "tweaks", "settings") }
+    val bottomBarRoutes = remember { setOf("home", "hibernate", "tweaks", "settings") }
     val installingDialog = rememberInstallingDialog()
     val updateDialog = rememberConfirmDialog(
         onConfirm = {
@@ -352,24 +342,15 @@ fun MainScreen(fromTileType: String? = null) {
                 ) {
                     composable("get_started") { GetStartedScreen(navController) }
                     composable("home") { HomeScreen() }
-                    composable("applist") { ApplistScreen(navController) }
+                    composable("hibernate") { HibernationScreen(navController) }
                     composable("tweaks") { TweakScreen(navController) }
                     composable("settings") { SettingsScreen(navController) }
                     composable("color_palette") { ColorPaletteScreen(navController) }
                     composable("colorscheme") { ColorSchemeSettings(navController) }
                     composable("FasScreen") { FasScreen(navController) }
-                    composable("bypasschg") { BypassChargeScreen(navController) }
-                    composable("bypasschg_check") { BypassChargeCheckScreen(navController) }
                     composable("preferenced") { PreferenceTweakScreen(navController) }
                     composable("aboutscreen") { AboutScreen(navController) }
                     composable("fpsgoscreen") { FpsGoSettings(navController) }
-                    composable(
-                        route = "app_settings/{pkg}",
-                        arguments = listOf(navArgument("pkg") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val pkg = backStackEntry.arguments?.getString("pkg")
-                        AppSettingsScreen(navController, pkg)
-                    }
                 }
                 
                 AnimatedVisibility(

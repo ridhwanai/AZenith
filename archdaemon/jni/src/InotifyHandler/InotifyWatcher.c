@@ -109,7 +109,6 @@ int setup_inotify_watchers(void) {
     } targets[] = {{"/data/adb/.config/AZenith/", IN_MODIFY | IN_CREATE | IN_MOVED_TO},
                    {"/data/adb/.config/AZenith/API/", IN_MODIFY | IN_CREATE | IN_MOVED_TO},
                    {"/data/adb/.config/AZenith/gamelist/", IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE},
-                   {"/data/adb/.config/AZenith/bypasschgconfig/", IN_MODIFY | IN_CREATE | IN_MOVED_TO},
                    {"/data/adb/modules/AZenith/", IN_MODIFY | IN_CREATE | IN_MOVED_TO | IN_DELETE}};
 
     for (size_t i = 0; i < sizeof(targets) / sizeof(targets[0]); i++) {
@@ -226,33 +225,6 @@ bool process_inotify_events(int inotify_fd, DaemonContext* ctx, int timeout_ms) 
                                 }
                                 fclose(fp);
                             }
-                        } else if (strcmp(event->name, "bypasspath") == 0) {
-                            char path[PATH_MAX];
-                            snprintf(path, sizeof(path), "/data/adb/.config/AZenith/bypasschgconfig/bypasspath");
-                            FILE* fp = fopen(path, "r");
-                            if (fp) {
-                                if (fgets(ctx->config_bypasspath, sizeof(ctx->config_bypasspath), fp))
-                                    trim_newline(ctx->config_bypasspath);
-                                fclose(fp);
-                            }
-                        } else if (strcmp(event->name, "bypasschg") == 0) {
-                            char path[PATH_MAX], val[16] = {0};
-                            snprintf(path, sizeof(path), "/data/adb/.config/AZenith/bypasschgconfig/bypasschg");
-                            FILE* fp = fopen(path, "r");
-                            if (fp) {
-                                if (fgets(val, sizeof(val), fp))
-                                    ctx->config_bypasschg = atoi(val);
-                                fclose(fp);
-                            }
-                        } else if (strcmp(event->name, "bypasschgthreshold") == 0) {
-                            char path[PATH_MAX], val[16] = {0};
-                            snprintf(path, sizeof(path), "/data/adb/.config/AZenith/bypasschgconfig/bypasschgthreshold");
-                            FILE* fp = fopen(path, "r");
-                            if (fp) {
-                                if (fgets(val, sizeof(val), fp))
-                                    ctx->config_bypasschgthreshold = atoi(val);
-                                fclose(fp);
-                            }
                         }
                     }
                     ptr += sizeof(struct inotify_event) + event->len;
@@ -261,40 +233,4 @@ bool process_inotify_events(int inotify_fd, DaemonContext* ctx, int timeout_ms) 
         }
     }
     return false;
-}
-
-/**
- * @brief Evaluates and applies dynamic battery bypass threshold logic.
- * @param ctx Pointer to DaemonContext structure.
- */
-void handle_dynamic_bypass(DaemonContext* ctx) {
-    if (strcmp(ctx->config_bypasspath, "UNSUPPORTED") != 0 && strlen(ctx->config_bypasspath) > 0) {
-        if (ctx->cur_mode == PERFORMANCE_PROFILE) {
-            int threshold = ctx->config_bypasschgthreshold;
-            int current_battery = current_system_cache.battery_level;
-            int is_device_charging = current_system_cache.is_charging;
-
-            if (current_battery >= 0 && ctx->config_bypasschg == 1 && is_device_charging) {
-                if (current_battery >= threshold) {
-                    if (read_current_ma() > 50) {
-                        enable_bypass();
-                        if (!ctx->bypass_applied) {
-                            log_zenith(LOG_INFO, "InotifyHandler: Bypass Enabled: Battery (%d%%) >= Threshold (%d%%)", current_battery, threshold);
-                            ctx->bypass_applied = true;
-                        }
-                    }
-                } else if (ctx->bypass_applied) {
-                    log_zenith(LOG_INFO, "InotifyHandler: Bypass Disabled: Battery (%d%%) dropped below threshold (%d%%)", current_battery, threshold);
-                    disable_bypass();
-                    ctx->bypass_applied = false;
-                }
-            } else if (ctx->bypass_applied) {
-                disable_bypass();
-                ctx->bypass_applied = false;
-            }
-        } else if (ctx->bypass_applied) {
-            disable_bypass();
-            ctx->bypass_applied = false;
-        }
-    }
 }

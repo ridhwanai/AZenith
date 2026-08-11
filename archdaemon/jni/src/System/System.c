@@ -88,6 +88,10 @@ int main_daemon(void) {
                 poll_timeout = (int)((10.0 - elapsed) * 1000);
             else
                 poll_timeout = 0;
+        } else {
+            int eco_wait = screen_off_eco_wait_ms(&ctx);
+            if (eco_wait >= 0)
+                poll_timeout = eco_wait;
         }
 
         bool should_exit = process_inotify_events(inotify_fd, &ctx, poll_timeout);
@@ -114,8 +118,6 @@ int main_daemon(void) {
             systemv("sys.azenith-profilesettings applyfreqbalance");
         }
         strcpy(ctx.last_freqoffset, ctx.config_freqoffset);
-
-        handle_dynamic_bypass(&ctx);
 
         if (ctx.is_initialize_complete && strcmp(ctx.prev_ai_state, "0") == 0)
             continue;
@@ -147,8 +149,9 @@ int main_daemon(void) {
         int effective_screen_state = real_screen_state;
         if (real_screen_state != ctx.prev_screen_state) {
             if (real_screen_state == 0) {
+                ctx.screen_off_timer = time(NULL);
+                ctx.screen_off_eco_applied = false;
                 if (ctx.cur_mode == PERFORMANCE_PROFILE) {
-                    ctx.screen_off_timer = time(NULL);
                     ctx.grace_period_active = true;
                     log_zenith(LOG_INFO, "Screen OFF Event: Grace period started (10s)...");
                 }
@@ -158,6 +161,10 @@ int main_daemon(void) {
                     ctx.grace_period_active = false;
                 }
                 ctx.screen_off_timer = 0;
+                if (ctx.screen_off_eco_applied) {
+                    screen_off_eco_release();
+                    ctx.screen_off_eco_applied = false;
+                }
                 ctx.need_profile_checkup = true;
             }
             ctx.prev_screen_state = real_screen_state;
@@ -169,13 +176,14 @@ int main_daemon(void) {
             else {
                 log_zenith(LOG_INFO, "Grace period expired. Dropping Performance Profile.");
                 ctx.grace_period_active = false;
-                ctx.screen_off_timer = 0;
+                ctx.screen_off_timer = time(NULL);
                 effective_screen_state = 0;
                 ctx.need_profile_checkup = true;
             }
         }
 
-        if (ctx.is_initialize_complete && ctx.cur_mode != PERFORMANCE_PROFILE && gamestart == NULL && !ctx.need_profile_checkup)
+        if (ctx.is_initialize_complete && ctx.cur_mode != PERFORMANCE_PROFILE && gamestart == NULL && !ctx.need_profile_checkup &&
+            !screen_off_eco_due(&ctx, real_screen_state))
             continue;
 
         if (ctx.is_initialize_complete && gamestart && effective_screen_state) {
@@ -236,6 +244,11 @@ int main_daemon(void) {
                 }
             }
             apply_performance_profile(&ctx);
+        } else if (ctx.is_initialize_complete && screen_off_eco_due(&ctx, real_screen_state)) {
+            log_zenith(LOG_INFO, "Screen-off ECO: idle threshold reached, entering ECO Mode");
+            apply_eco_profile(&ctx);
+            screen_off_eco_hibernate();
+            ctx.screen_off_eco_applied = true;
         } else if (ctx.is_initialize_complete && get_low_power_state(&current_system_cache)) {
             apply_eco_profile(&ctx);
         } else {

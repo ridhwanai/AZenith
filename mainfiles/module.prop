@@ -3,6 +3,5 @@ name=AZenith火
 version=
 versionCode=
 author=ArchHaven Developers
-description=One, Two, Three! AZenith has arrived!
-updateJson=https://raw.githubusercontent.com/Liliya2727/Antares/main/update.json
+description=AZenith fork tuned for Redmi Note 9 (Helio G85, 4GB): native screen-off ECO + app hibernation, MediaTek-only profiles, bypass-charging removed. Based on AZenith by ArchHaven Developers (Apache-2.0).
 banner=module.banner.avif

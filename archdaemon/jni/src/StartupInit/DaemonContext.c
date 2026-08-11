@@ -41,7 +41,7 @@ void init_daemon_context(DaemonContext* ctx) {
     ctx->is_initialize_complete = false;
     ctx->dnd_enabled = false;
     ctx->need_profile_checkup = false;
-    ctx->bypass_applied = false;
+    ctx->screen_off_eco_applied = false;
     ctx->has_applied_renderer = false;
     ctx->grace_period_active = false;
     ctx->prev_screen_state = -1;

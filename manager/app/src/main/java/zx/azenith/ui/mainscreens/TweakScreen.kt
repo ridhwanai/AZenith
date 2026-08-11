@@ -543,15 +543,6 @@ fun TweakScreen(
                         ExpressiveList(
                             content = listOf(
                                 {
-                                    ExpressiveListItem(
-                                        leadingContent = { LeadingIcon(icon = Icons.Filled.Cable) },
-                                        onClick = { navController.navigate("bypasschg") },
-                                        headlineContent = { Text(stringResource(R.string.bcharging)) },
-                                        supportingContent = { Text(stringResource(R.string.bcharging_desc)) },
-                                        trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
-                                    )
-                                },
-                                {
                                     ExpressiveSwitchItem(                                        
                                         icon = Icons.Filled.ThermostatAuto,
                                         title = stringResource(R.string.thermalcore_service),

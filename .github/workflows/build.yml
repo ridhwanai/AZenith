@@ -75,7 +75,7 @@ jobs:
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android, armv7-linux-androideabi
+          targets: aarch64-linux-android
 
       - name: Install cargo-ndk
         run: cargo install cargo-ndk
@@ -84,27 +84,27 @@ jobs:
         working-directory: ./thermalcore
         run: |
           if [ "$V_TYPE" == "experimental" ]; then
-            cargo ndk -t arm64-v8a -t armeabi-v7a build
+            cargo ndk -t arm64-v8a build
           else
-            cargo ndk -t arm64-v8a -t armeabi-v7a build --release
+            cargo ndk -t arm64-v8a build --release
           fi
 
       - name: Compile AZenith Profilesettings
         working-directory: ./binprofiles
         run: |
           if [ "$V_TYPE" == "experimental" ]; then
-            cargo ndk -t arm64-v8a -t armeabi-v7a build
+            cargo ndk -t arm64-v8a build
           else
-            cargo ndk -t arm64-v8a -t armeabi-v7a build --release
+            cargo ndk -t arm64-v8a build --release
           fi
 
       - name: Compile AZenith Utility
         working-directory: ./binutils
         run: |
           if [ "$V_TYPE" == "experimental" ]; then
-            cargo ndk -t arm64-v8a -t armeabi-v7a build
+            cargo ndk -t arm64-v8a build
           else
-            cargo ndk -t arm64-v8a -t armeabi-v7a build --release
+            cargo ndk -t arm64-v8a build --release
           fi
 
       - name: Set up JDK 17
@@ -143,5 +143,5 @@ jobs:
             bash .github/scripts/telebot.sh "${{ steps.compileZip.outputs.zipName }}"
           else
             echo "Telegram bot token or chatid is undefined!"
-            exit 1
+            echo 'Telegram secrets not set, skipping upload.'
           fi

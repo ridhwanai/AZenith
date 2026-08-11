@@ -43,9 +43,7 @@ void print_help(void) {
            "\n"
            "     -actv, --appactivity      Open AZenith App Main Activity\n"
            "\n"
-           "     -cbc,  --checkbypasschg   Check bypass charge compatibility\n"
            "\n"
-           "     -bpl,  --bypasspathlist   Show all embedded bypass charging paths\n"
            "\n"
            "     -V,    --version          Show AZenith current version\n"
            "\n"
@@ -54,7 +52,6 @@ void print_help(void) {
            "Examples:\n"
            "     sys.azenith-service --run\n"
            "     sys.azenith-service --profile 2\n"
-           "     sys.azenith-service --bypasspathlist\n"
            "     sys.azenith-service --help\n",
            MODULE_VERSION);
 }

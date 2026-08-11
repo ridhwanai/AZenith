@@ -116,7 +116,6 @@ class TweakViewModel : ViewModel() {
         "persist.sys.azenithconf.schemeconfig",
         "persist.sys.azenithconf.DThermal",
         "persist.sys.azenithconf.usefpsgo",
-        "persist.sys.azenithconf.bypasschgthreshold",
         "persist.sys.azenithconf.preloadbudget",
         "persist.sys.azenith.custom_default_cpu_gov",
         "persist.sys.azenith.custom_powersave_cpu_gov",

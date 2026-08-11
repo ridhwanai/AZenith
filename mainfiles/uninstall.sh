@@ -48,3 +48,14 @@ for dir in "/data/adb/ap/bin" "/data/adb/ksu/bin"; do
     [ -d "$dir" ] && find "$dir" -name "sys.azenith-*" -exec rm -f {} +
 done
 
+# RN9 fork: make sure no package is left frozen after uninstall
+HIBLIST=/data/adb/.config/AZenith/eco/hibernate.list
+if [ -f "$HIBLIST" ]; then
+	for p in $(sed -e 's/#.*//' -e 's/[[:space:]]//g' "$HIBLIST" | grep -v '^$'); do
+		for op in RUN_ANY_IN_BACKGROUND RUN_IN_BACKGROUND WAKE_LOCK START_FOREGROUND; do
+			appops set "$p" $op allow >/dev/null 2>&1
+		done
+		am set-standby-bucket "$p" active >/dev/null 2>&1
+	done
+fi
+rm -f /dev/.azenith_drainmon.lock

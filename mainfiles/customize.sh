@@ -431,3 +431,67 @@ fi
 set_perm_recursive "$MODPATH/system/bin" 0 0 0755 0755
 
 installation_complete
+
+# ==========================================================
+# Redmi Note 9 (merlin / Helio G85 / 4GB) fork defaults
+# ==========================================================
+ui_print "- Applying Redmi Note 9 fork defaults"
+
+ECO_DIR=/data/adb/.config/AZenith/eco
+DRAIN_DIR=/data/adb/.config/AZenith/drain
+mkdir -p "$ECO_DIR" "$DRAIN_DIR"
+
+# Screen-off ECO is handled natively by the daemon.
+[ -f "$ECO_DIR/enabled" ] || echo 1 > "$ECO_DIR/enabled"
+[ -f "$ECO_DIR/delay" ] || echo 300 > "$ECO_DIR/delay"
+[ -f "$DRAIN_DIR/enabled" ] || echo 1 > "$DRAIN_DIR/enabled"
+[ -f "$DRAIN_DIR/interval" ] || echo 60 > "$DRAIN_DIR/interval"
+
+if [ ! -f "$ECO_DIR/hibernate.list" ]; then
+	cat >"$ECO_DIR/hibernate.list" <<'HIBEOF'
+# One package name per line. Lines starting with # are ignored.
+# These apps are frozen when the screen has been off past the ECO delay,
+# and thawed the moment the screen turns back on.
+#
+# DO NOT add: messaging apps you need instantly (WhatsApp, Telegram),
+# alarms/clock, banking OTP, dialer, SMS, or your input method.
+#
+# Examples (uncomment what you actually want frozen):
+#com.facebook.katana
+#com.instagram.android
+#com.shopee.id
+#com.zhiliaoapp.musically
+HIBEOF
+fi
+
+set_perm "$MODPATH/azenith-hibernate.sh" 0 0 0755
+set_perm "$MODPATH/azenith-drainmon.sh" 0 0 0755
+set_perm "$MODPATH/azenith-report" 0 0 0755
+mkdir -p "$MODPATH/system/bin"
+cp -f "$MODPATH/azenith-report" "$MODPATH/system/bin/azenith-report"
+set_perm "$MODPATH/system/bin/azenith-report" 0 0 0755
+
+# Thermal disabler stays OFF: this device pairs a fast-charge module with an
+# aging battery, and disabling thermal protection there is genuinely unsafe.
+setprop persist.sys.azenithconf.DThermal 0
+
+if [ ! -f /data/adb/.config/AZenith/.rn9_defaults_applied ]; then
+	setprop persist.sys.azenithconf.fpsged 1
+	setprop persist.sys.azenithconf.usefpsgo 1
+	setprop persist.sys.azenithconf.malisched 1
+	setprop persist.sys.azenithconf.schedtunes 1
+	setprop persist.sys.azenithconf.justintime 1
+	setprop persist.sys.azenithconf.iosched 1
+	setprop persist.sys.azenithconf.clearbg 1
+	setprop persist.sys.azenithconf.disabletrace 1
+	setprop persist.sys.azenithconf.logd 1
+	setprop persist.sys.azenithconf.thermalcore 1
+	setprop persist.sys.azenithconf.APreload 0
+	setprop persist.sys.azenithconf.cpulimit 0
+	setprop persist.sys.azenithconf.preloadbudget 150M
+	touch /data/adb/.config/AZenith/.rn9_defaults_applied
+fi
+
+ui_print "- Screen-off ECO: enabled, 300s delay (edit $ECO_DIR/delay)"
+ui_print "- Hibernation list: $ECO_DIR/hibernate.list"
+ui_print "- Drain report: run 'azenith-report' in a root shell"

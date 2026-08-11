@@ -49,10 +49,6 @@ int main(int argc, char* argv[]) {
         clearlogs();
         return 0;
     }
-    if (IS_CMD(cmd, "--bypasspathlist", "-bpl")) {
-        print_bypass_path_list();
-        return 0;
-    }
     if (IS_CMD(cmd, "--rerun", "-rr")) 
         return restart_service();
 
@@ -66,8 +62,6 @@ int main(int argc, char* argv[]) {
         return handle_log(argc, argv);
     if (IS_CMD(cmd, "--verboselog", "-vl"))
         return handle_verboselog(argc, argv);
-    if (IS_CMD(cmd, "--checkbypasschg", "-cbc"))
-        return check_bypass_compatibility();
 
     fprintf(stderr, "\033[31mERROR:\033[0m Unknown command: %s\n", cmd);
     return 1;

@@ -67,7 +67,6 @@
 #define MODULE_PROP "/data/adb/modules/AZenith/module.prop"
 #define MODULE_UPDATE "/data/adb/modules/AZenith/update"
 #define MODULE_REMOVE "/data/adb/modules/AZenith/remove"
-#define BYPASSCHG_CONFIG "/data/adb/.config/AZenith/bypasschgconfig"
 #define MODULE_VERSION ".placeholder"
 #define APP_MONITOR_FILE "/data/adb/.config/AZenith/app_status"
 
@@ -141,13 +140,6 @@ typedef enum : char {
 } ProfileMode;
 
 typedef struct {
-    const char* name;
-    const char* path;
-    const char* on_val;
-    const char* off_val;
-} BypassNode;
-
-typedef struct {
     char package[256];
 } PreloadArgs;
 
@@ -155,9 +147,9 @@ typedef struct {
     bool is_initialize_complete;
     bool dnd_enabled;
     bool need_profile_checkup;
-    bool bypass_applied;
     bool has_applied_renderer;
     bool grace_period_active;
+    bool screen_off_eco_applied;
     int prev_screen_state;
     int saved_refresh_rate;
     int saved_zen_mode;
@@ -169,17 +161,11 @@ typedef struct {
     char prev_ai_state[16];
     const char* java_lock_path;
     char config_freqoffset[PROP_VALUE_MAX];
-    char config_bypasspath[PROP_VALUE_MAX];
-    int config_bypasschg;
-    int config_bypasschgthreshold;
 } DaemonContext;
 
 extern const char* VALID_AZENITH_PROPS[];
 extern const size_t VALID_AZENITH_PROPS_COUNT;
 void validateprop(void);
-
-extern BypassNode bypass_list[];
-extern const int bypass_list_size;
 
 extern char* gamestart;
 extern char* active_app_name;
@@ -197,7 +183,6 @@ extern pthread_mutex_t cache_mutex;
 void load_initial_config_files(DaemonContext* ctx);
 void init_daemon_context(DaemonContext* ctx);
 
-extern BypassNode bypass_list[]; 
 extern char* gamestart;
 extern char* custom_log_tag;
 
@@ -207,15 +192,6 @@ extern int game_pid_count;
 // Main Loop
 int main_daemon(void);
 void free_gamelist_cache(void);
-
-// Bypass Charging
-int echo_to_file(const char* path, const char* value, int lock);
-int is_charging();
-int read_current_ma();
-void disable_bypass();
-int enable_bypass();
-int check_bypass_compatibility();
-void print_bypass_path_list();
 
 // CLI
 void print_help();
@@ -285,10 +261,15 @@ bool get_low_power_state_normal(SystemStateCache* cache);
 void run_profiler(const int profile);
 void read_app_status(SystemStateCache* cache);
 void extract_string_value(char* dest, const char* start, size_t max_len);
-void handle_dynamic_bypass(DaemonContext* ctx);
 void apply_performance_profile(DaemonContext* ctx);
 void apply_eco_profile(DaemonContext* ctx);
 void apply_balanced_profile(DaemonContext* ctx);
+
+// Screen-off ECO (RN9 fork)
+bool screen_off_eco_due(DaemonContext* ctx, int screen_state);
+int screen_off_eco_wait_ms(DaemonContext* ctx);
+void screen_off_eco_hibernate(void);
+void screen_off_eco_release(void);
 
 // inotifyhandler
 void verify_system_integrity(void);

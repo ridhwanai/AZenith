@@ -1,9 +1,5 @@
 use crate::utils::*; use std::fs; use std::path::Path; use std::process::Command;
 use crate::chipsets::mediatek::*;
-use crate::chipsets::snapdragon::*;
-use crate::chipsets::exynos::*;
-use crate::chipsets::unisoc::*;
-use crate::chipsets::tensor::*;
 
 pub fn performance_profile() {
     let mut performance_gov = getprop("persist.sys.azenith.custom_performance_cpu_gov");
@@ -124,10 +120,6 @@ pub fn performance_profile() {
     if !lite_mode {
         match getprop("persist.sys.azenith.soctype").as_str() {
             "1" => mediatek_performance(),
-            "2" => snapdragon_performance(),
-            "3" => exynos_performance(),
-            "4" => unisoc_performance(),
-            "5" => tensor_performance(),
             _ => {}
         }
     }
@@ -238,10 +230,6 @@ pub fn balanced_profile() {
 
     match getprop("persist.sys.azenith.soctype").as_str() {
         "1" => mediatek_balance(),
-        "2" => snapdragon_balance(),
-        "3" => exynos_balance(),
-        "4" => unisoc_balance(),
-        "5" => tensor_balance(),
         _ => {}
     }
 
@@ -340,10 +328,6 @@ pub fn eco_mode() {
 
     match getprop("persist.sys.azenith.soctype").as_str() {
         "1" => mediatek_powersave(),
-        "2" => snapdragon_powersave(),
-        "3" => exynos_powersave(),
-        "4" => unisoc_powersave(),
-        "5" => tensor_powersave(),
         _ => {}
     }
 

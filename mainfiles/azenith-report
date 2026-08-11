@@ -1,0 +1,72 @@
+#!/system/bin/sh
+#
+# AZenith-RN9 :: Drain Report Viewer
+# Jalankan di Termux (root):  azenith-report
+#
+
+CFG="/data/adb/.config/AZenith"
+DDIR="$CFG/drain"
+HDIR="$CFG/hibernate"
+TOP=${1:-20}
+
+case "$TOP" in '' | *[!0-9]*) TOP=20 ;; esac
+
+show() {
+	_file="$1"
+	_title="$2"
+	echo ""
+	echo "=================================================="
+	echo " $_title"
+	echo "=================================================="
+	if [ ! -s "$_file" ]; then
+		echo " (belum ada data - biarkan HP dipakai dulu beberapa jam)"
+		return
+	fi
+	printf ' %-42s %10s\n' "PAKET" "CPU (menit)"
+	echo " --------------------------------------------------------"
+	sort -k2 -rn "$_file" | head -n "$TOP" | awk '{ printf "  %-42s %10.1f\n", $1, $2/100/60 }'
+}
+
+echo ""
+echo " AZenith-RN9 :: Laporan Konsumsi Baterai per Aplikasi"
+echo " Folder data: $DDIR"
+
+show "$DDIR/.tally-off" "LAYAR MATI  (biang baterai bocor)"
+show "$DDIR/.tally-on" "LAYAR NYALA (wajar kalau tinggi)"
+
+if [ -s "$DDIR/.tally-wakelock" ]; then
+	echo ""
+	echo "=================================================="
+	echo " WAKELOCK saat layar mati (yang bikin HP gak tidur)"
+	echo "=================================================="
+	printf ' %-42s %10s\n' "TAG" "HITUNGAN"
+	echo " --------------------------------------------------------"
+	sort -k2 -rn "$DDIR/.tally-wakelock" | head -n "$TOP" | awk '{ printf "  %-42s %10d\n", $1, $2 }'
+fi
+
+echo ""
+echo "=================================================="
+echo " DAFTAR HIBERNASI SAAT INI"
+echo "=================================================="
+if [ -f "$HDIR/hibernate.list" ]; then
+	_n=$(sed -e 's/#.*//' -e 's/[[:space:]]//g' "$HDIR/hibernate.list" | grep -cE '^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$')
+	sed -e 's/#.*//' -e 's/[[:space:]]//g' "$HDIR/hibernate.list" |
+		grep -E '^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$' | sed 's/^/  - /'
+	[ "$_n" -eq 0 ] && echo "  (kosong - belum ada app yang dihibernasi)"
+else
+	echo "  (file hibernate.list belum dibuat)"
+fi
+
+echo ""
+echo " Status  : $([ -f "$HDIR/.applied" ] && echo 'SEDANG HIBERNASI' || echo 'aktif normal')"
+echo " Delay   : $(cat "$HDIR/delay" 2>/dev/null || echo 300) detik setelah layar mati"
+echo ""
+echo " Edit daftar : nano $HDIR/hibernate.list"
+echo " Reset data  : azenith-report --reset"
+echo ""
+
+if [ "$1" = "--reset" ]; then
+	rm -f "$DDIR/.tally-on" "$DDIR/.tally-off" "$DDIR/.tally-wakelock"
+	echo " -> Data statistik direset."
+	echo ""
+fi

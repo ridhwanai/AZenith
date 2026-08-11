@@ -25,6 +25,9 @@ need_integrity=(
 	"mainfiles/module.prop"
     "mainfiles/module.banner.avif"
 	"mainfiles/azenithApplist.json"
+	"mainfiles/azenith-hibernate.sh"
+	"mainfiles/azenith-drainmon.sh"
+	"mainfiles/azenith-report"
     "mainfiles/AZenith.apk"
 )
 
@@ -44,7 +47,6 @@ fi
 echo "Using Rust build profile: $RUST_PROFILE"
 
 mkdir -p mainfiles/libs/arm64-v8a
-mkdir -p mainfiles/libs/armeabi-v7a
 mkdir -p mainfiles/system/bin
 
 [ -d "libs" ] && cp -r libs/* mainfiles/libs/ 2>/dev/null
@@ -56,9 +58,6 @@ cp thermalcore/target/aarch64-linux-android/$RUST_PROFILE/rianixia-thermalcore m
 cp binprofiles/target/aarch64-linux-android/$RUST_PROFILE/azenith-profilesettings mainfiles/libs/arm64-v8a/sys.azenith-profilesettings 2>/dev/null || true
 cp binutils/target/aarch64-linux-android/$RUST_PROFILE/azenith-utilityconf mainfiles/libs/arm64-v8a/sys.azenith-utilityconf 2>/dev/null || true
 
-cp thermalcore/target/armv7-linux-androideabi/$RUST_PROFILE/rianixia-thermalcore mainfiles/libs/armeabi-v7a/sys.azenith-rianixiathermalcore 2>/dev/null || true
-cp binprofiles/target/armv7-linux-androideabi/$RUST_PROFILE/azenith-profilesettings mainfiles/libs/armeabi-v7a/sys.azenith-profilesettings 2>/dev/null || true
-cp binutils/target/armv7-linux-androideabi/$RUST_PROFILE/azenith-utilityconf mainfiles/libs/armeabi-v7a/sys.azenith-utilityconf 2>/dev/null || true
 
 # Other Files
 cp azenithApplist.json mainfiles/

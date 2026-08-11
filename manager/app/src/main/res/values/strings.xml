@@ -366,4 +366,5 @@
     <string name="str_version_code">Version Code</string>
     <string name="str_package_name">Package Name</string>
     <string name="str_device_uptime">Device Uptime</string>
-    </resources>
+        <string name="nav_hibernate">Hibernasi</string>
+</resources>
