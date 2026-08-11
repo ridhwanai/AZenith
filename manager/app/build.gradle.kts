@@ -29,9 +29,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("azenith.jks")
-            storePassword = System.getenv("KS_PWD")
+            storePassword = System.getenv("KS_PWD") ?: "azenithrn9"
             keyAlias = "azenith_key"
-            keyPassword = System.getenv("KS_PWD")
+            keyPassword = System.getenv("KS_PWD") ?: "azenithrn9"
         }
     }
     
