@@ -1,7 +1,7 @@
 id=AZenith
-name=AZenith火
+name=AZenith RN9 Edition
 version=
 versionCode=
-author=ArchHaven Developers
-description=AZenith fork tuned for Redmi Note 9 (Helio G85, 4GB): native screen-off ECO + app hibernation, MediaTek-only profiles, bypass-charging removed. Based on AZenith by ArchHaven Developers (Apache-2.0).
+author=wann (fork dari ArchHaven Developers)
+description=[RN9 Edition] Tuned for Redmi Note 9 (Helio G85): auto-ECO + app hibernation on screen off, battery drain report split by screen state, arm64-only. Based on AZenith by Zexshia (Apache-2.0).
 banner=module.banner.avif
