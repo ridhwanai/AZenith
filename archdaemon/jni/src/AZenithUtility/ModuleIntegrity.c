@@ -12,19 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * RN9 Edition: integrity and version gates are intentionally disabled so the
+ * module can be renamed. Both functions are kept as no-ops because they are
+ * declared in AZenith.h and called from System.c, DaemonStartup.c,
+ * InotifyWatcher.c and ProfileUtility.c.
  */
 
 #include <AZenith.h>
 
 /**
- * @brief Checks if the module properties have been renamed or modified by a 3rd party.
+ * @brief Disabled in this fork: module renaming is allowed.
  */
 void is_kanged(void) {
-    /* RN9 fork: built from source by the device owner, fork detection disabled. */
     return;
 }
 
+/**
+ * @brief Disabled in this fork: version mismatch no longer aborts the daemon.
+ */
 void check_module_version(void) {
-    /* RN9 fork: version is injected at build time; mismatch abort disabled. */
-    snprintf(DAEMON_VERSION, sizeof(DAEMON_VERSION), "%s", MODULE_VERSION);
+    return;
 }
