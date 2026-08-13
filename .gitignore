@@ -1,2 +1,25 @@
-target/
-sys.azenith-service
+# Android
+**/local.properties
+**/.gradle/
+**/build/
+**/captures/
+
+# Keystore / signing credentials
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.bak

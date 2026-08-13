@@ -6,7 +6,7 @@
 
 CFG="/data/adb/.config/AZenith"
 DDIR="$CFG/drain"
-HDIR="$CFG/hibernate"
+HDIR="$CFG/eco"
 TOP=${1:-20}
 
 case "$TOP" in '' | *[!0-9]*) TOP=20 ;; esac
@@ -28,11 +28,12 @@ show() {
 }
 
 echo ""
-echo " AZenith-RN9 :: Laporan Konsumsi Baterai per Aplikasi"
+echo " AZenith-RN9 :: Battery / CPU Activity Report"
 echo " Folder data: $DDIR"
+echo " Battery samples: $DDIR/battery_samples.csv"
 
-show "$DDIR/.tally-off" "LAYAR MATI  (biang baterai bocor)"
-show "$DDIR/.tally-on" "LAYAR NYALA (wajar kalau tinggi)"
+show "$DDIR/.tally-off" "CPU ACTIVITY - LAYAR MATI"
+show "$DDIR/.tally-on" "CPU ACTIVITY - LAYAR NYALA"
 
 if [ -s "$DDIR/.tally-wakelock" ]; then
 	echo ""
@@ -66,7 +67,7 @@ echo " Reset data  : azenith-report --reset"
 echo ""
 
 if [ "$1" = "--reset" ]; then
-	rm -f "$DDIR/.tally-on" "$DDIR/.tally-off" "$DDIR/.tally-wakelock"
+	rm -f "$DDIR/.tally-on" "$DDIR/.tally-off" "$DDIR/.tally-wakelock" "$DDIR/battery_samples.csv"
 	echo " -> Data statistik direset."
 	echo ""
 fi

@@ -1,12 +1,12 @@
 #!/system/bin/sh
 #
-# AZenith-RN9 :: Battery Drain Monitor
+# AZenith-RN9 :: CPU Activity Monitor (screen-state split)
 # Custom addition for Redmi Note 9 (Helio G85 / 4GB)
 #
-# Mencatat pemakaian CPU per-aplikasi dan memisahkannya menjadi dua laporan
+# Mencatat aktivitas CPU per-aplikasi dan memisahkannya menjadi dua laporan
 # di dalam SATU folder: /data/adb/.config/AZenith/drain/
 #   - drain-screen-on.txt   : boros saat layar NYALA
-#   - drain-screen-off.txt  : boros saat layar MATI  (ini biang baterai bocor)
+#   - drain-screen-off.txt  : aktivitas CPU saat layar MATI
 #
 
 CFG="/data/adb/.config/AZenith"

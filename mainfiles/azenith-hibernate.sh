@@ -4,10 +4,17 @@
 # Based on AZenith by Zexshia, Apache License 2.0.
 
 ECO_DIR=/data/adb/.config/AZenith/eco
+LEGACY_ECO_DIR=/data/adb/.config/AZenith/hibernate
 LIST=$ECO_DIR/hibernate.list
 LOG=$ECO_DIR/hibernate.log
 STATE=$ECO_DIR/.applied
 MAXLOG=131072
+
+# Keep upgrades from the first RN9 fork working if the canonical list is absent.
+if [ ! -f "$LIST" ] && [ -f "$LEGACY_ECO_DIR/hibernate.list" ]; then
+	mkdir -p "$ECO_DIR"
+	cp -f "$LEGACY_ECO_DIR/hibernate.list" "$LIST"
+fi
 
 log() {
 	[ -f "$LOG" ] && [ "$(stat -c %s "$LOG" 2>/dev/null || echo 0)" -gt "$MAXLOG" ] && : >"$LOG"
